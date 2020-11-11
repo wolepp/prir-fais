@@ -26,6 +26,11 @@ private:
     double *data;
     double Etot;
 
+    int myRank;
+    int processes;
+    int myColStart;
+    int myColEnd;
+
     void changeData();
 
     void changeDataUndo();
@@ -53,9 +58,11 @@ public:
 
     void setDataToChangeInSingleStep(int dataToChange);
 
-    void singleStep();
+    void singleStep(int i);
 
     Simulation(MyMPI *_mmpi);
+
+    void d(char *f, char *str) const;
 };
 
 #endif

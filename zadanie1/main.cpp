@@ -63,7 +63,7 @@ int main(int ac, char **av)
     }
 
     for (int i = 0; i < 1000; i++)
-        s->singleStep();
+        s->singleStep(i);
 
     mmpi->MPI_Finalize();
 }
