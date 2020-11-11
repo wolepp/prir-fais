@@ -123,17 +123,17 @@ void Simulation::singleStep() {
     if (!myRank) {
         // decyzja modulu MonteCarlo o akceptacji zmiany
         if (mc->accept(Etot, newEtot)) {
-            cout << ". Accepted Eold " << Etot << " newE " << newEtot << endl;
+            cout << "Accepted Eold " << Etot << " newE " << newEtot << endl;
             Etot = newEtot;
             // zaakceptowano zmiane -> nowa wartosc energii calkowitej
         } else {
             accepted = false;
-            cout << ". Not accepted Eold " << Etot << " newE " << newEtot << endl;
+            cout << "Not accepted Eold " << Etot << " newE " << newEtot << endl;
             // zmiany nie zaakceptowano -> przywracany stary stan, energia bez zmiany
         }
     }
 
-    mmpi->MPI_Bcast(&accepted, 1, MPI_CXX_BOOL, 0, MPI_COMM_WORLD);
+    mmpi->MPI_Bcast(&accepted, sizeof(accepted), MPI_BYTE, 0, MPI_COMM_WORLD);
     if (!accepted)
         changeDataUndo();
 }
