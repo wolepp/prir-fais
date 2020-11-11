@@ -58,7 +58,7 @@ public:
 
     void setDataToChangeInSingleStep(int dataToChange);
 
-    void singleStep(int i);
+    void singleStep();
 
     Simulation(MyMPI *_mmpi);
 

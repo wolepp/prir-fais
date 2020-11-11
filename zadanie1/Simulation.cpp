@@ -107,7 +107,7 @@ void Simulation::changeDataUndo() {
     }
 }
 
-void Simulation::singleStep(int i) {
+void Simulation::singleStep() {
     if (!myRank) {
         generateDataChange(); // wygenerowanie danych potrzebnych do zmiany stanu
     }
@@ -123,12 +123,12 @@ void Simulation::singleStep(int i) {
     if (!myRank) {
         // decyzja modulu MonteCarlo o akceptacji zmiany
         if (mc->accept(Etot, newEtot)) {
-            cout << i << ". Accepted Eold " << Etot << " newE " << newEtot << endl;
+            cout << ". Accepted Eold " << Etot << " newE " << newEtot << endl;
             Etot = newEtot;
             // zaakceptowano zmiane -> nowa wartosc energii calkowitej
         } else {
             accepted = false;
-            cout << i << ". Not accepted Eold " << Etot << " newE " << newEtot << endl;
+            cout << ". Not accepted Eold " << Etot << " newE " << newEtot << endl;
             // zmiany nie zaakceptowano -> przywracany stary stan, energia bez zmiany
         }
     }

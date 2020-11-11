@@ -43,7 +43,7 @@ int main(int ac, char **av)
     if (myRank == 0)
     {
         RandomNumberGenerator *rng = new RandomNumberGenerator();
- 
+
         double *data = new double[size * size];
         prepareData(data, size, rng);
 
@@ -63,7 +63,7 @@ int main(int ac, char **av)
     }
 
     for (int i = 0; i < 1000; i++)
-        s->singleStep(i);
+        s->singleStep();
 
     mmpi->MPI_Finalize();
 }
