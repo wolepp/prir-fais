@@ -11,42 +11,51 @@
 using namespace std;
 
 class Simulation {
-	private:
-		MyMPI *mmpi;
-		MonteCarlo *mc;
-		RandomNumberGenerator *rng;
-		EnergyCalculator *energyCalculator;
-		int size;  
-		int reducedSize;
-		int dataToChange;
-		double maxChange;
-		double *delta;
-		int *rows;
-		int *cols;
-		double *data;
-		double Etot;
+private:
+    MyMPI *mmpi;
+    MonteCarlo *mc;
+    RandomNumberGenerator *rng;
+    EnergyCalculator *energyCalculator;
+    int size;
+    int reducedSize;
+    int dataToChange;
+    double maxChange;
+    double *delta;
+    int *rows;
+    int *cols;
+    double *data;
+    double Etot;
 
-		void changeData();
-		void changeDataUndo();
-		void generateDataChange();
+    void changeData();
 
-	public:
-		void init();
-		double calcTotalEnergy();
-		double getTotalEnergy();
-		void calcInitialTotalEnergy();
+    void changeDataUndo();
 
-		void setInitialData( double *data, int size );
-		void setEnergyCalculator( EnergyCalculator *energyCalculator );
-		void setRandomNumberGenerator( RandomNumberGenerator *randomNumberGenerator );
-		void setMonterCarlo( MonteCarlo *mc );
+    void generateDataChange();
 
-		void setMaxChange( double maxChange );
-		void setDataToChangeInSingleStep( int dataToChange );
+public:
+    void init();
 
-		void singleStep();
+    double calcTotalEnergy();
 
-		Simulation( MyMPI *_mmpi );
+    double getTotalEnergy();
+
+    void calcInitialTotalEnergy();
+
+    void setInitialData(double *data, int size);
+
+    void setEnergyCalculator(EnergyCalculator *energyCalculator);
+
+    void setRandomNumberGenerator(RandomNumberGenerator *randomNumberGenerator);
+
+    void setMonterCarlo(MonteCarlo *mc);
+
+    void setMaxChange(double maxChange);
+
+    void setDataToChangeInSingleStep(int dataToChange);
+
+    void singleStep();
+
+    Simulation(MyMPI *_mmpi);
 };
 
 #endif
