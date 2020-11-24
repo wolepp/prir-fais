@@ -8,10 +8,6 @@
 using namespace std;
 
 
-void Simulation::d(char *f, char *str) const {
-    printf("DEBUG-sim:%s@%d %s\n", f, myRank, str);
-}
-
 Simulation::Simulation(MyMPI *_mmpi) {
     mmpi = _mmpi;
 }
@@ -58,7 +54,7 @@ void Simulation::init() {
     if (myRank == processes - 1) {
         myColEnd = size - 2;
     } else {
-        myColEnd = myColStart + part - 1;
+        myColEnd = myColStart + part;
     }
 }
 
@@ -70,7 +66,7 @@ double Simulation::calcTotalEnergy() {
     double Etot = 0.0;
     double reducedEtot;
     for (int row = 2; row < size - 2; row++)
-        for (int col = myColStart; col <= myColEnd; col++)
+        for (int col = myColStart; col < myColEnd; col++)
             Etot += energyCalculator->calc(data, size, row, col);
     mmpi->MPI_Allreduce(&Etot, &reducedEtot, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
     return reducedEtot * 0.5;
