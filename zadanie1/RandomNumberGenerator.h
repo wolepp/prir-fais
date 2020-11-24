@@ -6,6 +6,12 @@
 
 class RandomNumberGenerator {
 	public:
+            RandomNumberGenerator( long int seedval ) {
+                srand48( seedval );
+            }
+            RandomNumberGenerator() {
+                srand48( 1024 );
+            }
             double getDouble();
             int getInt( int max );
 };

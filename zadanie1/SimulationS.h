@@ -1,6 +1,6 @@
-#ifndef SIMULATION_H
+#ifndef SIMULATIONS_H
 
-#define SIMULATION_H
+#define SIMULATIONS_H
 
 #include<iostream>
 #include"MyMPI.h"
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-class Simulation {
+class SimulationS {
 	private:
 		MyMPI *mmpi;
 		MonteCarlo *mc;
@@ -46,7 +46,7 @@ class Simulation {
 
 		void singleStep();
 
-		Simulation( MyMPI *_mmpi );
+		SimulationS( MyMPI *_mmpi );
 };
 
 #endif
