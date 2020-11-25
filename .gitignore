@@ -1,5 +1,8 @@
 *.out
 *.x
+*.iml
 
 cmake-build-debug/
 .idea/
+out/
+zadanie2/out/
