@@ -146,6 +146,8 @@ public class Board implements BoardInterface {
         }
     }
 
+    // koniec klasy Pawn
+
     private final int m_size;
     private final int m_middlepoint_row;
     private final int m_middlepoint_col;
@@ -170,8 +172,7 @@ public class Board implements BoardInterface {
             final Integer[] indices = new Integer[N * N];
             Arrays.setAll(indices, i -> i);
             Collections.shuffle(Arrays.asList(indices));
-            for (int i = ThreadLocalRandom.current().nextInt(1, N * N); i > 0;
-                 --i) {
+            for (int i = ThreadLocalRandom.current().nextInt(1, N * N); i > 0; --i) {
                 final int x = indices[i];
                 board.addPawn(x / N, x % N);
             }
