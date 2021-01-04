@@ -2,4 +2,4 @@
 
 bash compile.sh
 echo "Uruchamiam w wersji jednowątkowej..."
-./a.out
+time ./a.out
