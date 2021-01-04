@@ -12,6 +12,7 @@ public class Optimizer implements OptimizerInterface {
         this.board = board;
         boardSize = board.getSize();
         initialize();
+        optimize();
     }
 
     @Override
@@ -27,8 +28,15 @@ public class Optimizer implements OptimizerInterface {
     private void initialize() {
         getPawnsInterfaces();
         createAndRegisterThreadsForPawns();
+    }
+
+    private void optimize() {
         runAllPawnsThreads();
         joinAllPawnsThreads();
+    }
+
+    private void runAllPawnsThreads() {
+        threads.forEach((id, thread) -> thread.start());
     }
 
     private void joinAllPawnsThreads() {
@@ -39,10 +47,6 @@ public class Optimizer implements OptimizerInterface {
                 e.printStackTrace();
             }
         });
-    }
-
-    private void runAllPawnsThreads() {
-        threads.forEach((id, thread) -> thread.start());
     }
 
     private void getPawnsInterfaces() {
