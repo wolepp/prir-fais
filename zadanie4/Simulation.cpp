@@ -4,6 +4,7 @@
 #include <iostream>
 #include <math.h>
 #include <iomanip>
+#include "omp.h"
 
 using namespace std;
 
@@ -12,6 +13,10 @@ Simulation::Simulation() {
 
 void Simulation::setRandomNumberGenerator(RandomNumberGenerator *randomNumberGenerator) {
     this->rng = randomNumberGenerator;
+#pragma omp parallel
+    {
+        srand48_r(omp_get_thread_num(), &drand_buf);
+    }
 }
 
 void Simulation::setEnergyCalculator(EnergyCalculator *energyCalculator) {
@@ -102,10 +107,20 @@ void Simulation::setDataToChangeInSingleStep(int dataToChange) {
 
 // do zrównoleglenia - konieczna wymiara generatora liczb losowych na drand48_r
 void Simulation::generateDataChange() {
-    for (int i = 0; i < dataToChange; i++) {
-        rows[i] = 2 + rng->getInt(reducedSize);
-        cols[i] = 2 + rng->getInt(reducedSize);
-        delta[i] = maxChange * (1.0 - 2.0 * rng->getDouble());
+    int i;
+    double rand1, rand2, rand3;
+#pragma omp parallel for schedule(static) \
+    default(none) shared(dataToChange, rows, cols, delta) \
+    private(i, rand1, rand2, rand3)
+    for (i = 0; i < dataToChange; i++) {
+        drand48_r(&drand_buf, &rand1);
+        drand48_r(&drand_buf, &rand2);
+        drand48_r(&drand_buf, &rand3);
+        int rand_row = (int) (rand1 * reducedSize);
+        int rand_col = (int) (rand2 * reducedSize);
+        rows[i] = 2 + rand_row;
+        cols[i] = 2 + rand_col;
+        delta[i] = maxChange * (1.0 - 2.0 * rand3);
     }
 }
 

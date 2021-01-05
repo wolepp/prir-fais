@@ -24,6 +24,7 @@ class Simulation {
 		int *cols;
 		double *data;
 		double Etot;
+		struct drand48_data drand_buf;
 
 		void changeData();
 		void changeDataUndo();

@@ -27,8 +27,7 @@ void prepareData(double *data, int size, RandomNumberGenerator *rng)
 
 int main(int ac, char **av)
 {
-//    const int size = 1004;
-    const int size = 54;
+    const int size = 1004;
 
     Simulation *s = new Simulation();
     EnergyCalculator *ec = new EnergyCalculator();
