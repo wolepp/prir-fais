@@ -162,7 +162,7 @@ public class Board implements BoardInterface {
 
     public static void main(String[] args) {
         OptimizerInterface optimizer = new Optimizer();
-        final int N = 9;
+        final int N = 5;
         Board board = new Board(
                 N,
                 ThreadLocalRandom.current().nextInt(N),
@@ -172,7 +172,9 @@ public class Board implements BoardInterface {
             final Integer[] indices = new Integer[N * N];
             Arrays.setAll(indices, i -> i);
             Collections.shuffle(Arrays.asList(indices));
-            for (int i = ThreadLocalRandom.current().nextInt(1, N * N); i > 0; --i) {
+//            for (int i = ThreadLocalRandom.current().nextInt(1, N * N); i > 0; --i) {
+            for (int i = 2; i > 0; --i) {
+//            for (int i = 1; i > 0; --i) {
                 final int x = indices[i];
                 board.addPawn(x / N, x % N);
             }
