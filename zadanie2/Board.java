@@ -161,8 +161,8 @@ public class Board implements BoardInterface {
     private final AtomicInteger m_id_generator = new AtomicInteger();
 
     public static void main(String[] args) {
-        OptimizerInterface optimizer = new Optimizer();
-        final int N = 5;
+        OptimizerInterface optimizer = new OptimizerV2();
+        final int N = 9;
         Board board = new Board(
                 N,
                 ThreadLocalRandom.current().nextInt(N),
@@ -173,7 +173,7 @@ public class Board implements BoardInterface {
             Arrays.setAll(indices, i -> i);
             Collections.shuffle(Arrays.asList(indices));
 //            for (int i = ThreadLocalRandom.current().nextInt(1, N * N); i > 0; --i) {
-            for (int i = 2; i > 0; --i) {
+            for (int i = 4; i > 0; --i) {
 //            for (int i = 1; i > 0; --i) {
                 final int x = indices[i];
                 board.addPawn(x / N, x % N);

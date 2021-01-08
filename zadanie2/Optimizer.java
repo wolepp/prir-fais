@@ -1,6 +1,7 @@
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Optimizer implements OptimizerInterface {
     private final HashSet<PawnHandler> pawns = new HashSet<>();
@@ -10,6 +11,8 @@ public class Optimizer implements OptimizerInterface {
     private int boardSize;
     private int meetingPointCol;
     private int meetingPointRow;
+    private OptimizationChecker optimizationChecker;
+    private Thread checkerThread;
 
     @Override
     public void setBoard(BoardInterface board) {
@@ -46,6 +49,7 @@ public class Optimizer implements OptimizerInterface {
     private void initialize() {
         populateSquares();
         getPawnsInterfaces();
+        createOptimizationChecker();
         createAndRegisterThreadsForPawns();
     }
 
@@ -59,11 +63,36 @@ public class Optimizer implements OptimizerInterface {
         }
     }
 
+    private void createOptimizationChecker() {
+        optimizationChecker = new OptimizationChecker(pawns.size());
+        checkerThread = new Thread(() -> {
+            while (!isMeetingPointOccupied()) {
+                optimizationChecker.lockChecker();
+            }
+        });
+    }
+
     private void optimize() {
         board.optimizationStart();
+        checkerThread.start();
         runAllPawnsThreads();
-        joinAllPawnsThreads();
+//        joinAllPawnsThreads();
+        joinCheckerThread();
+        stopAllPawns();
         board.optimizationDone();
+    }
+
+    private void stopAllPawns() {
+        pawns.forEach(handler -> {
+            handler.running = false;
+        });
+        threads.forEach((integer, thread) -> {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     private void runAllPawnsThreads() {
@@ -80,6 +109,14 @@ public class Optimizer implements OptimizerInterface {
         });
     }
 
+    private void joinCheckerThread() {
+        try {
+            checkerThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void getPawnsInterfaces() {
         for (int col = 0; col < boardSize; col++) {
             for (int row = 0; row < boardSize; row++) {
@@ -94,9 +131,10 @@ public class Optimizer implements OptimizerInterface {
     }
 
     private void threadFunction(PawnHandler handler) {
-        while (!isMeetingPointOccupied()) {
+        while (handler.running && !(handler.col == meetingPointCol && handler.row == meetingPointRow)) {
             handler.makeMove();
         }
+        optimizationChecker.pawnBlocked();
     }
 
     private void createAndRegisterThreadsForPawns() {
@@ -137,9 +175,12 @@ public class Optimizer implements OptimizerInterface {
                     this.isOccupied.set(true);
                 } else {
                     try {
+                        optimizationChecker.pawnBlocked();
                         this.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
+                    } finally {
+                        optimizationChecker.pawnUnblocked();
                     }
                 }
             }
@@ -162,6 +203,7 @@ public class Optimizer implements OptimizerInterface {
         int col;
         int row;
         int pawnId;
+        volatile boolean running = true;
         PawnInterface pawnRef;
 
         PawnHandler(int col, int row, PawnInterface pawnRef) {
@@ -176,15 +218,16 @@ public class Optimizer implements OptimizerInterface {
             int oldRow = row;
 
             Optional<Move> nextMove = getNextMoveWithLock();
-            nextMove.ifPresent(move -> {
+            nextMove.ifPresentOrElse(move -> {
                 switch (move) {
                     case UP -> this.row = pawnRef.moveUp();
                     case DOWN -> this.row = pawnRef.moveDown();
                     case LEFT -> this.col = pawnRef.moveLeft();
                     case RIGHT -> this.col = pawnRef.moveRight();
                 }
-            getSquare(oldCol, oldRow).release();
-
+                getSquare(oldCol, oldRow).release();
+            }, () -> {
+                this.running = false;
             });
         }
 
@@ -222,5 +265,31 @@ public class Optimizer implements OptimizerInterface {
             return getSquare(col + direction.col, row + direction.row).isNotOccupied();
         }
 
+    }
+
+    private class OptimizationChecker {
+        private final AtomicInteger movingPawnsCount;
+
+        public OptimizationChecker(int count) {
+            movingPawnsCount = new AtomicInteger(count);
+        }
+
+        public synchronized void pawnBlocked() {
+            if (movingPawnsCount.decrementAndGet() == 0) {
+                this.notify();
+            }
+        }
+
+        public void pawnUnblocked() {
+            movingPawnsCount.incrementAndGet();
+        }
+
+        public synchronized void lockChecker() {
+            try {
+                this.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
