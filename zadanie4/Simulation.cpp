@@ -46,10 +46,11 @@ double Simulation::calcTotalEnergy() {
     double Etot = 0.0;
     int end = size - 2;
     int row, col;
-#pragma omp parallel for schedule(static) default(none) shared(end, data) private(row, col) reduction(+:Etot)
+    double *dt = data;
+#pragma omp parallel for schedule(static) shared(end, dt) private(row, col) reduction(+:Etot)
     for (row = 2; row < end; row++) {
         for (col = 2; col < end; col++) {
-            Etot += energyCalculator->calc(data, size, row, col);
+            Etot += energyCalculator->calc(dt, size, row, col);
         }
     }
     return Etot * 0.5;
@@ -109,18 +110,22 @@ void Simulation::setDataToChangeInSingleStep(int dataToChange) {
 void Simulation::generateDataChange() {
     int i;
     double rand1, rand2, rand3;
+    int dtToChange = dataToChange;
+    int *rws = rows;
+    int *cls = cols;
+    double *dlt = delta;
 #pragma omp parallel for schedule(static) \
-    default(none) shared(dataToChange, rows, cols, delta) \
+    default(none) shared(dtToChange, rws, cls, dlt) \
     private(i, rand1, rand2, rand3)
-    for (i = 0; i < dataToChange; i++) {
+    for (i = 0; i < dtToChange; i++) {
         drand48_r(&drand_buf, &rand1);
         drand48_r(&drand_buf, &rand2);
         drand48_r(&drand_buf, &rand3);
         int rand_row = (int) (rand1 * reducedSize);
         int rand_col = (int) (rand2 * reducedSize);
-        rows[i] = 2 + rand_row;
-        cols[i] = 2 + rand_col;
-        delta[i] = maxChange * (1.0 - 2.0 * rand3);
+        rws[i] = 2 + rand_row;
+        cls[i] = 2 + rand_col;
+        dlt[i] = maxChange * (1.0 - 2.0 * rand3);
     }
 }
 
